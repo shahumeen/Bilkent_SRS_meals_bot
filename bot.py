@@ -147,6 +147,9 @@ async def process_user_request(
     email: str,
     email_password: str,
     status_message,
+    username: str = None,
+    first_name: str = None,
+    last_name: str = None,
 ) -> None:
     """Process a single user's meal request in the background."""
     
@@ -227,7 +230,10 @@ async def process_user_request(
         # Remove task from active tasks when done
         if user_id in active_user_tasks:
             del active_user_tasks[user_id]
-            logger.info(f"Completed request for user {user_id}")
+            logger.info(
+                f"Completed request for user {user_id} "
+                f"(username: @{username}, name: {first_name} {last_name})"
+            )
 
 
 async def handle_credentials(
@@ -300,6 +306,7 @@ async def handle_credentials(
     )
 
     # Create and track the background task for this user
+    user = update.effective_user
     task = asyncio.create_task(
         process_user_request(
             user_id=user_id,
@@ -308,6 +315,9 @@ async def handle_credentials(
             email=email,
             email_password=email_password,
             status_message=status_message,
+            username=user.username,
+            first_name=user.first_name,
+            last_name=user.last_name,
         )
     )
 
