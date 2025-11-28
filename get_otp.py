@@ -70,7 +70,7 @@ def get_otp_from_webmail(email, email_password, wait_time=60):
 
         # Wait for successful login - look for inbox with longer timeout
         print("Waiting for successful login...")
-        WebDriverWait(driver, 30).until(
+        WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.ID, "mailboxlist"))
         )
 
