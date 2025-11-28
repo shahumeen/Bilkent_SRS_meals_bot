@@ -295,7 +295,7 @@ async def handle_credentials(
 
     # Notify user that process is starting
     status_message = await update.message.reply_text(
-        "✅ Credentials received\n⏳ Checking your remaining meals securely..."
+        "✅ Credentials received...\n"
     )
 
     # Create and track the background task for this user
