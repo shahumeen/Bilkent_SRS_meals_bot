@@ -16,7 +16,7 @@ from telegram.ext import (
     filters,
 )
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from get_remaining_meals import get_remaining_meals, OTPRetrievalError
+from get_remaining_meals import get_remaining_meals, OTPRetrievalError, LoginCredentialsError
 
 # Load environment variables from .env file
 load_dotenv()
@@ -202,6 +202,7 @@ async def process_user_request(
                 f"🍽️ <b>Meals Remaining:</b> {remaining_meals}\n😊 Afiyet olsun!"
             )
         else:
+            # Only show generic message if no specific exception was raised
             await status_message.edit_text(
                 "❌ Couldn't retrieve meals this time.\n\n"
                 "🔎 Possible reasons:\n"
@@ -210,18 +211,28 @@ async def process_user_request(
                 "• 🛠️ SRS service might be down\n\n"
                 "🛡️ Your message was deleted for privacy—feel free to try again."
             )
+    except LoginCredentialsError:
+        # Show specific message for incorrect credentials
+        await status_message.edit_text(
+            "❌ Login failed: Incorrect Bilkent ID or password.\n\n"
+            "🛡️ Your message was deleted for privacy—feel free to try again."
+        )
     except OTPRetrievalError:
-        # Show the exact user-specified message without exposing internal errors
-        try:
-            await status_message.edit_text("Failed to retrieve OTP from email")
-        except:
-            pass
+        # Show specific message for OTP/email issues
+        await status_message.edit_text(
+            "❌ Failed to load OTP page. Make sure to type the passwords correctly."
+        )
     except Exception as e:
+        # Catch-all for unexpected errors
         logger.error(f"Error fetching meals for user {user_id}: {e}")
-        try:
-            await status_message.edit_text(f"❌ <b>Error</b>\n<code>{str(e)}</code>")
-        except:
-            pass
+        await status_message.edit_text(
+            "❌ Couldn't retrieve meals this time.\n\n"
+            "🔎 Possible reasons:\n"
+            "• ❗ Incorrect credentials\n"
+            "• 🌐 Network hiccups\n"
+            "• 🛠️ SRS service might be down\n\n"
+            "🛡️ Your message was deleted for privacy—feel free to try again."
+        )
     finally:
         # Remove task from active tasks when done
         if user_id in active_user_tasks:

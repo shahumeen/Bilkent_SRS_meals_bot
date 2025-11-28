@@ -17,6 +17,12 @@ class OTPRetrievalError(Exception):
     pass
 
 
+class LoginCredentialsError(Exception):
+    """Raised when login credentials are incorrect."""
+
+    pass
+
+
 def save_cookies(driver, filepath):
     """Save cookies to file"""
     try:
@@ -147,6 +153,25 @@ async def get_remaining_meals(
         # Submit login form
         login_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
         login_button.click()
+
+        # Check for login error message
+        try:
+            # Wait briefly to see if error message appears
+            await asyncio.sleep(0.23)
+            page_source = driver.page_source
+            
+            # Check for incorrect credentials message
+            if "The password or Bilkent ID number entered is incorrect." in page_source:
+                print("❌ Login failed: Incorrect Bilkent ID or password")
+                await update_status("❌ Login failed: Incorrect Bilkent ID or password")
+                raise LoginCredentialsError("The password or Bilkent ID number entered is incorrect.")
+                
+        except LoginCredentialsError:
+            # Re-raise the login error
+            raise
+        except Exception as e:
+            # Continue if we can't check for error (maybe page is loading)
+            pass
 
         # Wait for OTP page to load
         print("Waiting for OTP verification page...")
