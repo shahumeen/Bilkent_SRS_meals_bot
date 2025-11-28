@@ -161,7 +161,8 @@ async def get_remaining_meals(
             page_source = driver.page_source
             
             # Check for incorrect credentials message
-            if "The password or Bilkent ID number entered is incorrect." in page_source:
+            srs_pass_errors = ("Password is too short (minimum is 6 characters)", "The password or Bilkent ID number entered is incorrect",)
+            if any(error in page_source for error in srs_pass_errors):
                 print("❌ Login failed: Incorrect Bilkent ID or password")
                 await update_status("❌ Login failed: Incorrect Bilkent ID or password")
                 raise LoginCredentialsError("The password or Bilkent ID number entered is incorrect.")

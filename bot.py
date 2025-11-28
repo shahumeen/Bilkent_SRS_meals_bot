@@ -201,16 +201,6 @@ async def process_user_request(
             await status_message.edit_text(
                 f"🍽️ <b>Meals Remaining:</b> {remaining_meals}\n😊 Afiyet olsun!"
             )
-        else:
-            # Only show generic message if no specific exception was raised
-            await status_message.edit_text(
-                "❌ Couldn't retrieve meals this time.\n\n"
-                "🔎 Possible reasons:\n"
-                "• ❗ Incorrect credentials\n"
-                "• 🌐 Network hiccups\n"
-                "• 🛠️ SRS service might be down\n\n"
-                "🛡️ Your message was deleted for privacy—feel free to try again."
-            )
     except LoginCredentialsError:
         # Show specific message for incorrect credentials
         await status_message.edit_text(
