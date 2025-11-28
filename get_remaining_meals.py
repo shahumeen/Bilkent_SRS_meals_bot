@@ -197,9 +197,9 @@ async def get_remaining_meals(
         if not otp:
             print("Failed to retrieve OTP from email")
             # Inform user without exposing technical details
-            await update_status("Failed to retrieve OTP from email")
+            await update_status("❌ Failed to retrieve OTP from email")
             # Raise a specific error to let caller decide messaging
-            raise OTPRetrievalError("Failed to retrieve OTP from email")
+            raise OTPRetrievalError("❌ Failed to retrieve OTP from email")
 
         print(f"\nOTP received: {otp}")
         await update_status(f"🔑 OTP received: {otp}")
